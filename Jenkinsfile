@@ -19,6 +19,13 @@ pipeline {
 				sh 'python3 -m unittest -v test_app.py'
 				}
 			}
+			
+		stage('Docker verification') {
+			steps {
+				sh 'docker --version'
+				sh 'docker run --rm hello-world'
+				}
+			}
 		}
 
 	post {
