@@ -1,41 +1,32 @@
 pipeline {
-	agent any
+	agent any 
 	
 	stages {
 		stage('Checkout') {
 			steps {
-				echo 'source code is available in the workspace'
+				cehckout scm
 				}
 			}
-			
-		stage('Python Version') {
-			steps {
-				sh 'python3 --version'
-				}
-			}
-			
-		stage('Run Unit Tests') {
+		stage('Test') {
 			steps {
 				sh 'python3 -m unittest -v test_app.py'
 				}
 			}
 			
-		stage('Docker verification') {
+		stage('Build docker image') {
 			steps {
-				sh 'docker --version'
-				sh 'docker run --rm hello-world'
+				sh 'docker build -t python-ci-lab:latest .'
+				}
+			}
+			
+		stage('Deploy locally') {
+			steps {
+				sh '''
+					docker rm -f python-ci-lab-app || true
+					docker run -d --name python-ci-lab-app \
+					python-ci-lab:latest
+				'''
 				}
 			}
 		}
-
-	post {
-		success {
-			echo 'CI pipeline completed successfullly'
-			}
-		failure {
-			echo 'CI pipeline failed. check the console output'
-			}
-		}
 	}
-		
-
